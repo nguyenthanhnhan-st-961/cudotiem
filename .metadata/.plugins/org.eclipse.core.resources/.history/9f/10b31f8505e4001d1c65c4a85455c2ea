@@ -1,0 +1,5 @@
+package com.cudotiem.accountservice.service;
+
+public class ProfileService {
+
+}

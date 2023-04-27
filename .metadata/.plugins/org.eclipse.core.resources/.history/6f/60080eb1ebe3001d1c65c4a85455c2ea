@@ -1,0 +1,5 @@
+package com.cudotiem.accountservice.entity;
+
+public class User {
+
+}

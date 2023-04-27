@@ -1,0 +1,6 @@
+package com.cudotiem.accountservice.service;
+
+
+public class AddressService {
+
+}

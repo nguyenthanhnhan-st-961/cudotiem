@@ -1,0 +1,26 @@
+package com.cudotiem.accountservice.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.cudotiem.accountservice.dto.ProfileDto;
+import com.cudotiem.accountservice.entity.Profile;
+import com.cudotiem.accountservice.mapper.ProfileMapper;
+import com.cudotiem.accountservice.repository.ProfileRepository;
+
+public class ProfileService {
+
+	@Autowired
+	ProfileRepository profileRepository;
+	
+	private final ProfileMapper mapper = new ProfileMapper();
+
+	public ProfileDto getProfile(Long id) {
+		Profile profile = profileRepository.findById(id);
+		return mapper.toProfileDto(profile);
+	}
+
+	public String addProfile(ProfileDto profileDto) {
+		mapper.toProfile(profileDto);
+		return "add profile succesfully";
+	}
+}

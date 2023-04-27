@@ -1,0 +1,33 @@
+package com.cudotiem.accountservice.mapper;
+
+import org.springframework.stereotype.Component;
+
+import com.cudotiem.accountservice.dto.ProfileDto;
+import com.cudotiem.accountservice.entity.Address;
+import com.cudotiem.accountservice.entity.Profile;
+
+@Component
+public class ProfileMapper {
+	
+	public Profile toProfile(ProfileDto profileDto) {
+		Address address = new Address();
+		address.setProvince(profileDto.getProvince());
+		address.setDistrict(profileDto.getDistrict());
+
+		Profile profile = new Profile();
+		profile.setFisrtName(profileDto.getFisrtName());
+		profile.setLastName(profileDto.getLastName());
+		profile.setFullName(profileDto.getFisrtName() + " " + profileDto.getLastName());
+		profile.setPhoneNumber(profileDto.getPhoneNumber());
+		profile.setAvatar(profileDto.getAvatar());
+		profile.setAddress(address);
+		
+		return profile;
+	}
+	
+	public ProfileDto toProfileDto(Profile profile) {
+		return new ProfileDto(profile.getFisrtName(), profile.getLastName(), 
+				profile.getPhoneNumber(), profile.getAvatar(), 
+				profile.getAddress().getProvince(), profile.getAddress().getDistrict());
+	}
+}
