@@ -6,6 +6,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.cudotiem.postservice.dto.PostDetailDto;
@@ -53,6 +56,42 @@ public class PostService implements IPostService {
 		return postRepository.findAll().stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
 
 	}
+	
+	@Override
+	public List<PostDto> getAllPostsWithSort(String field) {
+		return postRepository.findAll(Sort.by(field)).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<PostDto> getPostsWithPagination(int offset, int size) {
+		return postRepository.findAll(PageRequest.of(offset, size)).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<PostDto> getPostsWithPaginationAndSort(String field, int offset, int size) {
+		return postRepository.findAll(PageRequest.of(offset, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<PostDto> filterPostsByPrice(double min, double max) {
+		return postRepository.findByPriceBetween(min, max).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<PostDto> filterPostsByPriceAndPagination(double min, double max, int offset, int size, String field) {
+		return postRepository.findByPricePagination(min, max, PageRequest.of(offset, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<PostDto> searchPostsByTitle(String title){
+		return postRepository.findAllByTitleLike(title).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<PostDto> searchPostsByTitleAndPagination(String title, int offset, int size, String field){
+		return postRepository.findAllByTitle(title, PageRequest.of(offset, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	}
+	
 
 	@Override
 	public PostDetailUserResponse getPostById(Long id) {

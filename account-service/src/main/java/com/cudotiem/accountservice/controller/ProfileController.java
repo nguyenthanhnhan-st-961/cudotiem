@@ -8,14 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cudotiem.accountservice.dto.ProfileDto;
-import com.cudotiem.accountservice.entity.Profile;
+import com.cudotiem.accountservice.payload.response.UserInfoResponse;
 import com.cudotiem.accountservice.service.IProfileService;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -25,13 +24,18 @@ public class ProfileController {
 	IProfileService profileService;
 
 	@GetMapping
-	public List<Profile> getAllProfiles() {
-		return profileService.getAllProfile();
+	public ResponseEntity<List<ProfileDto>> getAllProfiles() {
+		return ResponseEntity.ok().body(profileService.getAllProfile());
 	}
 	
 	@GetMapping("/{id}")
-	public Profile getProfile(@PathVariable Long id) {
-		return profileService.getProfile(id);
+	public ResponseEntity<ProfileDto> getProfile(@PathVariable Long id) {
+		return ResponseEntity.ok().body(profileService.getProfile(id));
+	}
+	
+	@GetMapping("/user-info/{id}")
+	public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long id) {
+		return ResponseEntity.ok().body(profileService.getUserInfo(id));
 	}
 
 	@PostMapping
@@ -42,8 +46,7 @@ public class ProfileController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<String> updateProfile(@PathVariable Long id, @RequestBody ProfileDto profileDto) {
-		ProfileDto request = profileDto;
-		profileService.updateProfile(id, request);
+		profileService.updateProfile(id, profileDto);
 		return ResponseEntity.ok().body("update profile successfully");
 	}
 }

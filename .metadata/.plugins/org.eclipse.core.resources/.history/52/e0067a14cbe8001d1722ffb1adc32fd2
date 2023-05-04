@@ -1,0 +1,15 @@
+package com.cudotiem.postservice.dto;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class UserDto {
+	
+	private String fisrtName;
+	private String lastName;
+	private String phoneNumber;
+	private String avatar;
+	private Integer idAddress;
+}

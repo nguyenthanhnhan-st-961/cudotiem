@@ -1,9 +1,0 @@
-package com.cudotiem.accountservice.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.cudotiem.accountservice.entity.Profile;
-
-public interface ProfileRepository extends JpaRepository<Profile, Long>{
-
-}

@@ -1,5 +1,0 @@
-package com.cudotiem.accountservice.entity;
-
-public enum EProvince {
-
-}

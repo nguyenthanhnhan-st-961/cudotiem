@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;APIClient.java&apos; to &apos;account-service/src/main/java/com.cudotiem.accountservice.service&apos;&#x0D;&#x0A;- Original project: &apos;post-service&apos;&#x0D;&#x0A;- Destination element: &apos;account-service/src/main/java/com.cudotiem.accountservice.service&apos;&#x0D;&#x0A;- Original element: &apos;com.cudotiem.postservice.service.APIClient.java&apos;" description="Copy compilation unit" destination="=account-service/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.cudotiem.accountservice.service" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.cudotiem.postservice.service{APIClient.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1683019988478" units="1" version="1.0"/>
+</session>

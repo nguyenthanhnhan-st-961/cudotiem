@@ -8,6 +8,6 @@ import com.cudotiem.postservice.dto.UserDto;
 
 @FeignClient(value = "account-service", url = "http://localhost:8081")
 public interface APIClient {
-	 @GetMapping(value = "/api/profile/{id}")
+	 @GetMapping(value = "/api/profile/user-info/{id}")
 	    UserDto getUserById(@PathVariable("id") Long idUser);
 }
