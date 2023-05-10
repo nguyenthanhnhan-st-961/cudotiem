@@ -6,6 +6,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config>{
@@ -16,7 +17,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 	RouteValidator validator;
 	
 	@Autowired
-	RestTemplate restTemplate;
+//	RestTemplate restTemplate;
+	WebClient webClient;
 
 	public AuthenticationFilter() {
 		super(Config.class); 
@@ -32,12 +34,22 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 				
 				String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
 				
-				if(authHeader != null && authHeader.startsWith("Bearner ")) {
-					authHeader = authHeader.substring(7);
+				String[] tokens = authHeader.split(" ");
+				
+				if(tokens.length != 2 || !tokens[0].equals("Bearer")) {
+					throw new RuntimeException("Incorrect authorization header");
 				}
 				
+//				if(authHeader != null && authHeader.startsWith("Bearer ")) {
+//					authHeader = authHeader.substring(7);
+//				}
+				
 				try {
-					restTemplate.getForObject("http://auth-service//validate?token" + authHeader, String.class);
+//					String temp = restTemplate.getForObject("http://AUTH-SERVICE/validate?token=" + tokens[1], String.class);
+					  webClient.get()
+				                 .uri("http://localhost:8083/api/auth/validate?token=" + tokens[1])
+				                         .retrieve()
+				                                 .bodyToMono(String.class);
 				} catch (Exception e) {
 					System.out.println("invalid access...!");
 					throw new RuntimeException("unauthorization");

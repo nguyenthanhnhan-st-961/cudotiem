@@ -7,17 +7,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cudotiem.postservice.dto.PostDetailDto;
 import com.cudotiem.postservice.dto.PostDto;
 import com.cudotiem.postservice.payload.request.PostDetailRequest;
 import com.cudotiem.postservice.payload.response.PostDetailResponse;
 import com.cudotiem.postservice.payload.response.PostDetailUserResponse;
+import com.cudotiem.postservice.payload.response.PostPaginationResponse;
 import com.cudotiem.postservice.service.IPostService;
 
 import jakarta.validation.Valid;
@@ -29,7 +28,7 @@ public class PostController {
 	@Autowired
 	IPostService service;
 
-	@GetMapping()
+	@GetMapping
 	public List<PostDto> getAllPosts() {
 		return service.getAllPosts();
 	}
@@ -40,12 +39,12 @@ public class PostController {
 	}
 
 	@GetMapping("/pagination")
-	public List<PostDto> getAllPostsWithPagination(@RequestParam int offset, @RequestParam int size) {
+	PostPaginationResponse getAllPostsWithPagination(@RequestParam int offset, @RequestParam int size) {
 		return service.getPostsWithPagination(offset, size);
 	}
 
-	@GetMapping("/sort/pagination")
-	public List<PostDto> getPostsWithPagination(@RequestParam String field, @RequestParam int offset,
+	@GetMapping("/sort-pagination")
+	PostPaginationResponse getPostsWithPagination(@RequestParam String field, @RequestParam int offset,
 			@RequestParam int size) {
 		return service.getPostsWithPaginationAndSort(field, offset, size);
 	}
@@ -56,7 +55,7 @@ public class PostController {
 //	}
 
 	@GetMapping("/filter")
-	List<PostDto> filterPostsByPriceAndPagination(@RequestParam double min, @RequestParam double max, @RequestParam int offset, @RequestParam int size, @RequestParam String field) {
+	PostPaginationResponse filterPostsByPriceAndPagination(@RequestParam double min, @RequestParam double max, @RequestParam int offset, @RequestParam int size, @RequestParam String field) {
 		return service.filterPostsByPriceAndPagination(min, max, offset, size, field);
 	}
 
@@ -66,7 +65,7 @@ public class PostController {
 //	}
 
 	@GetMapping("/search")
-	List<PostDto> searchPostsByTitleAndPagination(@RequestParam String title, @RequestParam int offset, @RequestParam int size, @RequestParam String field) {
+	PostPaginationResponse searchPostsByTitleAndPagination(@RequestParam String title, @RequestParam int offset, @RequestParam int size, @RequestParam String field) {
 		return service.searchPostsByTitleAndPagination(title, offset, size, field);
 	}
 

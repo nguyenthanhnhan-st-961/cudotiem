@@ -1,5 +1,0 @@
-package com.cudotiem.accountservice.payload.response;
-
-public class UserInfoResponse {
-
-}

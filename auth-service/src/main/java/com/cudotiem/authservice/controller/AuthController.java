@@ -75,7 +75,11 @@ public class AuthController {
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(
-				new UserInfoResponse(userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
+				jwtCookie.toString()
+		/*
+		 * new UserInfoResponse(userDetails.getId(), userDetails.getUsername(),
+		 * userDetails.getEmail(), roles)
+		 */);
 	}
 
 	@PostMapping("/signup")
@@ -151,7 +155,7 @@ public class AuthController {
 		}
 	}
 
-	@PostMapping("/validate")
+	@GetMapping("/validate")
 	public String validateToken(@RequestParam String token) {
 		jwtUtils.validateJwtToken(token);
 		return "token is valid";

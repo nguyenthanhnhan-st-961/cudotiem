@@ -1,29 +1,25 @@
 package com.cudotiem.postservice.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.cudotiem.postservice.dto.PostDetailDto;
 import com.cudotiem.postservice.dto.PostDto;
 import com.cudotiem.postservice.dto.UserDto;
 import com.cudotiem.postservice.entity.Category;
 import com.cudotiem.postservice.entity.EStatus;
-import com.cudotiem.postservice.entity.Image;
 import com.cudotiem.postservice.entity.Post;
 import com.cudotiem.postservice.mapper.ImageMapper;
 import com.cudotiem.postservice.mapper.PostMapper;
 import com.cudotiem.postservice.payload.request.PostDetailRequest;
 import com.cudotiem.postservice.payload.response.PostDetailResponse;
 import com.cudotiem.postservice.payload.response.PostDetailUserResponse;
-import com.cudotiem.postservice.repository.CategoryRepository;
+import com.cudotiem.postservice.payload.response.PostPaginationResponse;
 import com.cudotiem.postservice.repository.PostRepository;
 import com.cudotiem.postservice.service.APIClient;
 import com.cudotiem.postservice.service.ICategoryService;
@@ -63,13 +59,25 @@ public class PostService implements IPostService {
 	}
 	
 	@Override
-	public List<PostDto> getPostsWithPagination(int offset, int size) {
-		return postRepository.findAll(PageRequest.of(offset, size)).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	public PostPaginationResponse getPostsWithPagination(int offset, int size) {
+		PostPaginationResponse result = new PostPaginationResponse();
+		Integer totalItem = postRepository.findAll().size();
+		Integer totalPage = totalItem / size;
+		List<PostDto> listPostDto = postRepository.findAll(PageRequest.of(offset - 1, size)).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+		result.setPaginationPosts(listPostDto);
+		result.setTotalPage(totalItem % size == 0 ? totalPage : totalPage + 1);
+		return result;
 	}
 	
 	@Override
-	public List<PostDto> getPostsWithPaginationAndSort(String field, int offset, int size) {
-		return postRepository.findAll(PageRequest.of(offset, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	public PostPaginationResponse getPostsWithPaginationAndSort(String field, int offset, int size) {
+		PostPaginationResponse result = new PostPaginationResponse();
+		Integer totalItem = postRepository.findAll().size();
+		Integer totalPage = totalItem / size;
+		List<PostDto> listPostDto = postRepository.findAll(PageRequest.of(offset - 1, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+		result.setPaginationPosts(listPostDto);
+		result.setTotalPage(totalItem % size == 0 ? totalPage : totalPage + 1);
+		return result;
 	}
 	
 	@Override
@@ -78,8 +86,14 @@ public class PostService implements IPostService {
 	}
 	
 	@Override
-	public List<PostDto> filterPostsByPriceAndPagination(double min, double max, int offset, int size, String field) {
-		return postRepository.findByPricePagination(min, max, PageRequest.of(offset, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	public PostPaginationResponse filterPostsByPriceAndPagination(double min, double max, int offset, int size, String field) {
+		PostPaginationResponse result = new PostPaginationResponse();
+		Integer totalItem = postRepository.findByPriceBetween(min, max).size();
+		Integer totalPage = totalItem / size;
+		List<PostDto> listPostDto = postRepository.findByPricePagination(min, max, PageRequest.of(offset - 1, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+		result.setPaginationPosts(listPostDto);
+		result.setTotalPage(totalItem % size == 0 ? totalPage : totalPage + 1);
+		return result;
 	}
 	
 	@Override
@@ -88,8 +102,14 @@ public class PostService implements IPostService {
 	}
 	
 	@Override
-	public List<PostDto> searchPostsByTitleAndPagination(String title, int offset, int size, String field){
-		return postRepository.findAllByTitle(title, PageRequest.of(offset, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+	public PostPaginationResponse searchPostsByTitleAndPagination(String title, int offset, int size, String field){
+		PostPaginationResponse result = new PostPaginationResponse();
+		Integer totalItem = postRepository.findAllByTitleLike(title).size();
+		Integer totalPage = totalItem / size;
+		List<PostDto> listPostDto = postRepository.findAllByTitle(title, PageRequest.of(offset - 1, size).withSort(Sort.by(field))).stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
+		result.setPaginationPosts(listPostDto);
+		result.setTotalPage(totalItem % size == 0 ? totalPage : totalPage + 1);
+		return result;
 	}
 	
 
@@ -108,11 +128,6 @@ public class PostService implements IPostService {
 		return postDetailUserResponse;
 
 	}
-
-//	@Override
-//	public PostDetailUserResponse getPostByUrl(String url) {
-//		
-//	}
 
 	@Override
 	public Long createPost(PostDetailRequest request) {

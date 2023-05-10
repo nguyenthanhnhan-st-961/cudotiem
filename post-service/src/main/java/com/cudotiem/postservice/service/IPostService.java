@@ -1,16 +1,12 @@
 package com.cudotiem.postservice.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-
-import com.cudotiem.postservice.dto.PostDetailDto;
 import com.cudotiem.postservice.dto.PostDto;
-import com.cudotiem.postservice.entity.Post;
 import com.cudotiem.postservice.payload.request.PostDetailRequest;
 import com.cudotiem.postservice.payload.response.PostDetailResponse;
 import com.cudotiem.postservice.payload.response.PostDetailUserResponse;
+import com.cudotiem.postservice.payload.response.PostPaginationResponse;
 
 public interface IPostService {
 	
@@ -18,17 +14,17 @@ public interface IPostService {
 	
 	List<PostDto> getAllPostsWithSort(String field);
 	
-	List<PostDto> getPostsWithPagination(int offset, int size);
+	PostPaginationResponse getPostsWithPagination(int offset, int size);
 	
-	List<PostDto> getPostsWithPaginationAndSort(String field, int offset, int size);
+	PostPaginationResponse getPostsWithPaginationAndSort(String field, int offset, int size);
 
 	List<PostDto> filterPostsByPrice(double min, double max);
 	
-	List<PostDto> filterPostsByPriceAndPagination(double min, double max, int offset, int size, String field);
+	PostPaginationResponse filterPostsByPriceAndPagination(double min, double max, int offset, int size, String field);
 	
 	List<PostDto> searchPostsByTitle(String title);
 	
-	List<PostDto> searchPostsByTitleAndPagination(String title, int offset, int size, String field);
+	PostPaginationResponse searchPostsByTitleAndPagination(String title, int offset, int size, String field);
 	
 	PostDetailUserResponse getPostById(Long id);
 	
