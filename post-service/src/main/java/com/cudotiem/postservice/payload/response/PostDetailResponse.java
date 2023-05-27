@@ -1,13 +1,15 @@
 package com.cudotiem.postservice.payload.response;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import com.cudotiem.postservice.entity.Category;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+// đối tượng trả về chi tiết bài viết hiển thị cho người dùng
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostDetailResponse {
 
 	private Long id;
@@ -18,15 +20,15 @@ public class PostDetailResponse {
 
 	private Double price;
 
-	private String url;
+	private String slug;
 
-	private Long idUser;
+	private String username;
 
 	private List<String> imageUrls;
 
-	private LocalDateTime dateCreated;
+	private Long dateCreated;
 
-	private LocalDateTime dateUpdated;
+	private Long dateUpdated;
 
-	private Category Category;
+	private String categoryName;
 }

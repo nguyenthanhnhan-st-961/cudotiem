@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
 	    helper.setSubject(subject);
 	     
 	    content = content.replace("[[name]]", user.getUsername());
-	    String verifyURL ="http://localhost:8083/api/auth/verify?code=" + user.getVerificationCode();
+	    String verifyURL ="http://localhost:8083/api/v1/auth/verify?code=" + user.getVerificationCode();
 	     
 	    content = content.replace("[[URL]]", verifyURL);
 	     
@@ -134,6 +134,10 @@ public class UserServiceImpl implements UserService {
 	        return true;
 	    }
 	     
+	}
+	
+	public String getUsernameFromToken(String token) {
+		return "";
 	}
 
 }

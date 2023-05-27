@@ -17,7 +17,7 @@ import com.cudotiem.accountservice.payload.response.UserInfoResponse;
 import com.cudotiem.accountservice.service.IProfileService;
 
 @RestController
-@RequestMapping("/api/profile")
+@RequestMapping("/api/v1/profile")
 public class ProfileController {
 
 	@Autowired

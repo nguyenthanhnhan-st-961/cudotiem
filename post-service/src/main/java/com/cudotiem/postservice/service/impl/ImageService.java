@@ -1,15 +1,10 @@
 package com.cudotiem.postservice.service.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.cudotiem.postservice.dto.ImageDto;
 import com.cudotiem.postservice.entity.Image;

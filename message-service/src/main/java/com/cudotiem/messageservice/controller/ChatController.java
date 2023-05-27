@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cudotiem.messageservice.model.Message;
 
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/api/v1/chat")
 public class ChatController {
 
 	private static final String CHAT_TOPIC = "chat";

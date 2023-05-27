@@ -1,6 +1,7 @@
 package com.cudotiem.postservice.mapper;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +9,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
-import com.cudotiem.postservice.dto.PostDetailDto;
-import com.cudotiem.postservice.dto.PostDto;
-import com.cudotiem.postservice.entity.Category;
+import com.cudotiem.postservice.dto.post.PostAdminDto;
+import com.cudotiem.postservice.dto.post.PostApprovedDto;
+import com.cudotiem.postservice.dto.post.PostDetailDto;
+import com.cudotiem.postservice.dto.post.PostDto;
+import com.cudotiem.postservice.dto.post.PostUserDto;
 import com.cudotiem.postservice.entity.Post;
 import com.cudotiem.postservice.payload.response.PostDetailResponse;
 
@@ -21,7 +24,62 @@ public class PostMapper {
 	ModelMapper mapper;
 	
 	public PostDto toPostDto(Post post) {
-		return mapper.map(post, PostDto.class);
+		PostDto result = new PostDto();
+		
+		LocalDateTime localDateTime = post.getDatePosted();
+		long milliseconds = localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		
+		result.setId(post.getId());
+		result.setTitle(post.getTitle());
+		result.setPrice(post.getPrice());
+		result.setSlug(post.getSlug());
+		result.setThumbnail(post.getImages().get(0).getUrl());
+		result.setDatePosted(milliseconds);
+		return result;
+	}
+	
+	public PostApprovedDto toPostApprovedDto(Post post) {
+		PostApprovedDto result = new PostApprovedDto();
+		
+		LocalDateTime localDateTime = post.getDatePosted();
+		long milliseconds = localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		
+		result.setId(post.getId());
+		result.setTitle(post.getTitle());
+		result.setPrice(post.getPrice());
+		result.setSlug(post.getSlug());
+		result.setThumbnail(post.getImages().get(0).getUrl());
+		result.setDatePosted(milliseconds);
+		return result;
+	}
+	
+	public PostUserDto toPostUserDto(Post post) {
+		PostUserDto result = new PostUserDto();
+		result.setId(post.getId());
+		result.setTitle(post.getTitle());
+		result.setPrice(post.getPrice());
+		result.setSlug(post.getSlug());
+		result.setThumbnail(post.getImages().get(0).getUrl());
+		result.setDatePosted(post.getDatePosted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+		result.setDateCreated(post.getDateCreated().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+		result.setStatus(post.getStatus().toString());
+		return result;
+	}
+	
+	public PostAdminDto toPostAdminDto(Post post) {
+		PostAdminDto result = new PostAdminDto();
+		result.setId(post.getId());
+		result.setTitle(post.getTitle());
+		result.setPrice(post.getPrice());
+		result.setSlug(post.getSlug());
+		result.setThumbnail(post.getImages().get(0).getUrl());
+		result.setDatePosted(post.getDatePosted().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+		result.setDateCreated(post.getDateCreated().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+		result.setDateUpdated(post.getDateUpdated().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+		result.setUsername(post.getUsername());
+		result.setStatus(post.getStatus().toString());
+		result.setCategory(post.getCategory().getName());
+		return result;
 	}
 	
 	public PostDetailDto toPostDetailDto(Post post) {
@@ -45,12 +103,12 @@ public class PostMapper {
 		postDetailResponse.setTitle(post.getTitle());
 		postDetailResponse.setContent(post.getContent());
 		postDetailResponse.setPrice(post.getPrice());
-		postDetailResponse.setUrl(post.getUrl());
-		postDetailResponse.setIdUser(post.getIdUser());
+		postDetailResponse.setSlug(post.getSlug());
+		postDetailResponse.setUsername(post.getUsername());
 		postDetailResponse.setImageUrls(imageUrls);
-		postDetailResponse.setDateCreated(null); 
-		postDetailResponse.setDateUpdated(null); 
-		postDetailResponse.setCategory(post.getCategory());
+		postDetailResponse.setDateCreated(post.getDateCreated().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()); 
+		postDetailResponse.setDateUpdated(post.getDateUpdated().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()); 
+		postDetailResponse.setCategoryName(post.getCategory().getName());
 		
 		return postDetailResponse;
 	}

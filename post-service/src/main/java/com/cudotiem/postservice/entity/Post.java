@@ -2,13 +2,9 @@ package com.cudotiem.postservice.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,8 +14,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
@@ -48,9 +42,11 @@ public class Post {
 	private Double price;
 	
 	@Column(nullable = false, unique = true)
-	private String url;
+	private String slug;
 	
-	private Long idUser;
+	private String username;
+	
+	private LocalDateTime datePosted;
 	
 	@OneToMany(mappedBy = "post")
 	private List<Image> images;

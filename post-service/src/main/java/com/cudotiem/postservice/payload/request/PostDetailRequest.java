@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.Data;
 
+// đối tượng người dùng gửi yêu cầu thêm và chỉnh sửa bài viết
 @Data
 public class PostDetailRequest {
 
@@ -13,11 +14,7 @@ public class PostDetailRequest {
 
 	private Double price;
 
-	private String url;
-
-	private Long idUser;
-
 	private List<String> imageUrls;
 
-	private Long idCategory;
+	private String categoryCode;
 }
