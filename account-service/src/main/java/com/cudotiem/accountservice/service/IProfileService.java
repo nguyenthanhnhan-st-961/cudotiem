@@ -10,7 +10,7 @@ public interface IProfileService {
 
 	public List<ProfileDto> getAllProfile();
 	public ProfileDto getProfile(Long id);
-	public UserInfoResponse getUserInfo(Long id);
+	public UserInfoResponse getUserInfo(String username);
 	public String addProfile();
 	public String updateProfile(Long id, ProfileDto profileDto);
 }

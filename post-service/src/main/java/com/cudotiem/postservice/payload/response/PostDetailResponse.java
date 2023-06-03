@@ -26,9 +26,7 @@ public class PostDetailResponse {
 
 	private List<String> imageUrls;
 
-	private Long dateCreated;
-
-	private Long dateUpdated;
+	private Long datePosted;
 
 	private String categoryName;
 }

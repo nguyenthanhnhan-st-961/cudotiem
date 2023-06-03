@@ -3,12 +3,16 @@ package com.cudotiem.postservice.service.impl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cudotiem.postservice.dto.UserDto;
 import com.cudotiem.postservice.dto.post.PostAdminDto;
@@ -58,6 +62,9 @@ public class PostService implements IPostService {
 	@Autowired
 	AuthClient authClient;
 
+	@Autowired
+	MessageSource messageSource;
+
 	@Override
 	public List<PostDto> getAllPosts() {
 		return postRepository.findAll().stream().map(post -> postMapper.toPostDto(post)).collect(Collectors.toList());
@@ -65,13 +72,17 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public PostPaginationResponse<PostAdminDto> getPostsAdmin(int offset, int size, String field) {
+	public PostPaginationResponse<PostAdminDto> getPostsAdmin(Locale locale, int offset, int size, String field) {
 		PostPaginationResponse<PostAdminDto> result = new PostPaginationResponse<>();
 		Integer totalItem = postRepository.findAll().size();
 		Integer totalPage = totalItem / size;
 		List<PostAdminDto> listPostDto = postRepository
-				.findAll(PageRequest.of(offset - 1, size).withSort(Sort.by(field))).stream()
-				.map(post -> postMapper.toPostAdminDto(post)).collect(Collectors.toList());
+				.findAll(PageRequest.of(offset - 1, size).withSort(Sort.by(Sort.Direction.DESC, field))).stream()
+				.map(post -> {
+					PostAdminDto postAdminDto = postMapper.toPostAdminDto(post);
+					postAdminDto.setCategoryName(messageSource.getMessage(post.getCategory().getName(), null, locale));
+					return postAdminDto;
+				}).collect(Collectors.toList());
 		result.setPaginationPosts(listPostDto);
 		result.setTotalPage(totalItem % size == 0 ? totalPage : totalPage + 1);
 		return result;
@@ -82,12 +93,13 @@ public class PostService implements IPostService {
 		PostPaginationResponse<PostUserDto> result = new PostPaginationResponse<>();
 		// get username
 		String username = authClient.getUsername(token);
-		
+
 		Integer totalItem = postRepository.findAllByUsernameLike(username).size();
 		Integer totalPage = totalItem / size;
 		List<PostUserDto> listPostDto = postRepository
-				.findAllByUsernameLike(username, PageRequest.of(offset - 1, size).withSort(Sort.by(field))).stream()
-				.map(post -> postMapper.toPostUserDto(post)).collect(Collectors.toList());
+				.findAllByUsernameLike(username,
+						PageRequest.of(offset - 1, size).withSort(Sort.by(Sort.Direction.DESC, field)))
+				.stream().map(post -> postMapper.toPostUserDto(post)).collect(Collectors.toList());
 		result.setPaginationPosts(listPostDto);
 		result.setTotalPage(totalItem % size == 0 ? totalPage : totalPage + 1);
 		return result;
@@ -100,8 +112,8 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public PostPaginationResponse<PostApprovedDto> filterPostsByPriceAndPagination(double min, double max, int offset, int size,
-			String field) {
+	public PostPaginationResponse<PostApprovedDto> filterPostsByPriceAndPagination(double min, double max, int offset,
+			int size, String field) {
 		PostPaginationResponse<PostApprovedDto> result = new PostPaginationResponse<>();
 		Integer totalItem = postRepository.findByPriceBetween(min, max).size();
 		Integer totalPage = totalItem / size;
@@ -143,10 +155,10 @@ public class PostService implements IPostService {
 	public PostPaginationResponse<PostApprovedDto> getPostsApproved(int offset, int size, String field) {
 
 		PostPaginationResponse<PostApprovedDto> result = new PostPaginationResponse<>();
-		Integer totalItem = postRepository.findAllByStatusEqualAprroved().size();
+		Integer totalItem = postRepository.findAllByStatus(EStatus.APPROVED).size();
 		Integer totalPage = totalItem / size;
 		List<PostApprovedDto> listPostDto = postRepository
-				.findAllByStatusEqualAprroved(PageRequest.of(offset - 1, size).withSort(Sort.by(field))).stream()
+				.findAllByStatus(EStatus.APPROVED, PageRequest.of(offset - 1, size).withSort(Sort.by(field))).stream()
 				.map(post -> postMapper.toPostApprovedDto(post)).collect(Collectors.toList());
 		result.setPaginationPosts(listPostDto);
 		result.setTotalPage(totalItem % size == 0 ? totalPage : totalPage + 1);
@@ -154,12 +166,13 @@ public class PostService implements IPostService {
 	}
 
 	@Override
-	public PostDetailUserResponse getPostById(Long id) {
+	public PostDetailUserResponse getPostById(Long id, Locale locale) {
 
 		PostDetailUserResponse postDetailUserResponse = new PostDetailUserResponse();
 
 		Post post = postRepository.findById(id).get();
 		PostDetailResponse postDetailResponse = postMapper.toDetailResponse(post);
+		postDetailResponse.setCategoryName(messageSource.getMessage(post.getCategory().getName(), null, locale));
 		UserDto userDto = profileClient.getUserByUsername(post.getUsername());
 
 		postDetailUserResponse.setPostDetailResponse(postDetailResponse);
@@ -185,9 +198,10 @@ public class PostService implements IPostService {
 		// get username
 		String username = authClient.getUsername(token);
 
+		post.setIdPost(-1L);
 		post.setTitle(postDetailRequest.getTitle());
 		post.setContent(postDetailRequest.getContent());
-		post.setStatus(EStatus.PENDING);
+		post.setStatus(EStatus.CREATE_PENDING);
 		post.setPrice(postDetailRequest.getPrice());
 		post.setSlug(slug.toString());
 		post.setUsername(username);
@@ -197,9 +211,12 @@ public class PostService implements IPostService {
 		post.setCategory(category);
 
 		Post createdPost = postRepository.save(post);
+		post.setIdPost(post.getId());
 		imageService.uploadImages(images, createdPost);
 
-		return post.getId();
+		postRepository.save(createdPost);
+
+		return post.getIdPost();
 	}
 
 	@Override
@@ -209,30 +226,75 @@ public class PostService implements IPostService {
 		if (post == null)
 			return null;
 
-		post.setStatus(status);
-		post.setDatePosted(LocalDateTime.now());
+		if (status.equals(EStatus.APPROVED)) {
+			post.setStatus(EStatus.APPROVED);
+			post.setDatePosted(LocalDateTime.now());
+		} else if (status.equals(EStatus.CREATE_REJECTED)) {
+			post.setStatus(EStatus.CREATE_REJECTED);
+		} else {
+			post.setStatus(EStatus.HIDDEN);
+			post.setDateUpdated(LocalDateTime.now());
+		}
 		postRepository.save(post);
-
 		return postMapper.toDetailResponse(post);
 	}
 
 	@Override
-	public PostDetailResponse updatePostById(Long id, PostDetailDto postDetailDto) {
-		Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found by id"));
-		List<Image> images = postDetailDto.getImageUrls().stream().map(url -> imageService.getImageByUrl(url))
-				.collect(Collectors.toList());
+	public PostDetailResponse updateApproved(Long id, EStatus status) {
+		List<Post> posts = postRepository.findByIdPost(id);
+		if (posts == null || posts.size() != 2)
+			return null;
+		Post oldPost = posts.get(0).getDateCreated().isBefore(posts.get(1).getDateCreated()) ? posts.get(0)
+				: posts.get(1);
+		Post newPost = posts.get(0).getDateCreated().isBefore(posts.get(1).getDateCreated()) ? posts.get(1)
+				: posts.get(0);
 
-		Category category = categoryRepository.findByCode(postDetailDto.getCategoryCode());
+		if (status.equals(EStatus.APPROVED)) {
+			oldPost.setTitle(newPost.getTitle());
+			oldPost.setContent(newPost.getContent());
+			oldPost.setPrice(newPost.getPrice());
+			oldPost.setImages(newPost.getImages());
+			oldPost.setCategory(newPost.getCategory());
+//			oldPost.setStatus(status);
+		} else {
+			oldPost.setStatus(EStatus.APPROVED);
+		}
 
-		post.setTitle(postDetailDto.getTitle());
-		post.setContent(postDetailDto.getContent());
-		post.setPrice(postDetailDto.getPrice());
-		post.setUsername(postDetailDto.getUsername());
-		post.setImages(images);
-		post.setDateUpdated(LocalDateTime.now());
-		post.setCategory(category);
-		postRepository.save(post);
-		return postMapper.toDetailResponse(post);
+		oldPost.setDateUpdated(LocalDateTime.now());
+		postRepository.delete(newPost);
+		postRepository.save(oldPost);
+
+		return postMapper.toDetailResponse(oldPost);
+	}
+
+	@Override
+	public String updatePostById(Long id, EStatus status, PostDetailRequest postDetailRequest) {
+		
+		if (postDetailRequest != null) {
+
+			Post newContentPost = new Post();
+			List<Image> images = postDetailRequest.getImageUrls().stream().map(url -> imageService.getImageByUrl(url))
+					.collect(Collectors.toList());
+
+			Category category = categoryRepository.findByCode(postDetailRequest.getCategoryCode());
+
+			newContentPost.setIdPost(id);
+			newContentPost.setTitle(postDetailRequest.getTitle());
+			newContentPost.setContent(postDetailRequest.getContent());
+			newContentPost.setStatus(EStatus.UPDATE_PENDING);
+			newContentPost.setPrice(postDetailRequest.getPrice());
+			newContentPost.setImages(images);
+			newContentPost.setDateUpdated(LocalDateTime.now());
+			newContentPost.setCategory(category);
+			return postRepository.save(newContentPost) instanceof Post ? "the post has been sent" : null;
+		} else {
+			Post oldContentPost = postRepository.findById(id)
+					.orElseThrow(() -> new RuntimeException("Post not found by id"));
+			oldContentPost.setStatus(status);
+			return postRepository.save(oldContentPost) instanceof Post ? "the post has been sent" : null;
+		}
+
+		
 	}
 
 	@Override
@@ -242,6 +304,7 @@ public class PostService implements IPostService {
 			Post post = postRepository.findById(id).get();
 			if (post != null)
 				post.setStatus(EStatus.HIDDEN);
+			post.setDateUpdated(LocalDateTime.now());
 		}
 
 	}

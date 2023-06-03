@@ -39,8 +39,8 @@ public class ProfileServiceImpl implements IProfileService {
 		return mapper.toProfileDto(profile);
 	}
 	
-	public UserInfoResponse getUserInfo(Long id) {
-		Profile profile = profileRepository.findById(id).get();
+	public UserInfoResponse getUserInfo(String username) {
+		Profile profile = profileRepository.findByUsername(username);
 		
 		UserInfoResponse userInfo = new UserInfoResponse();
 		userInfo.setAvatar(profile.getAvatar());

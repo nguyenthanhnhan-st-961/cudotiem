@@ -29,6 +29,9 @@ public class Post {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@Column(nullable = false)
+	private Long idPost;
 
 	@Column(nullable = false, length = 100)
 	private String title;
@@ -41,7 +44,7 @@ public class Post {
 	@Column(nullable = false)
 	private Double price;
 	
-	@Column(nullable = false, unique = true)
+	@Column(unique = true)
 	private String slug;
 	
 	private String username;
@@ -60,5 +63,5 @@ public class Post {
 	@ManyToOne
 	@JoinColumn(name = "id_category")
 	private Category category;
-
+	
 }

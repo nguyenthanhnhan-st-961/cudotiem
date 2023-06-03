@@ -20,5 +20,5 @@ public class PostAdminDto extends PostDto {
 
 	private String username;
 
-	private String category;
+	private String categoryName;
 }

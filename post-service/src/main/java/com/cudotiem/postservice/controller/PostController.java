@@ -1,8 +1,11 @@
 package com.cudotiem.postservice.controller;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,24 +38,36 @@ public class PostController {
 	@Autowired
 	IPostService service;
 
-//	@GetMapping
-//	public List<PostDto> getAllPosts() {
-//		return service.getAllPosts();
-//	}
+	@Autowired
+	MessageSource messageSource;
+	
+	// testing api
+	@GetMapping("/post/greeting")
+	public String getGreeting(@RequestHeader(value = "Accept-Language", required = false) Locale locale) {
+	    return messageSource.getMessage("category", null, locale);
+	}
 
+// admin api
 	// hiển thị danh sách tất cả bài viết ở trang admin(PostAdminDto)
 	@GetMapping("/admin/post")
-	ResponseEntity<PostPaginationResponse<PostAdminDto>> getAllPostsAdmin(@RequestParam int offset,
+	ResponseEntity<PostPaginationResponse<PostAdminDto>> getAllPostsAdmin(@RequestHeader(value = "Accept-Language", required = false) Locale locale, @RequestParam int offset,
 			@RequestParam int size, @RequestParam(defaultValue = "dateCreated") String field) {
-		return ResponseEntity.ok().body(service.getPostsAdmin(offset, size, field));
+		return ResponseEntity.ok().body(service.getPostsAdmin(locale, offset, size, field));
 	}
-	
 
+	// admin approve or reject the request create post
 	@PutMapping("/admin/post/{id}")
 	public PostDetailResponse handlePost(@PathVariable Long id, @RequestParam EStatus status) {
 		return service.handlePost(id, status);
 	}
+	
+	// admin approve or reject the request update post
+	@PutMapping("/admin/post/update-approved/{id}")
+	public PostDetailResponse updateApproved(@PathVariable Long id, @RequestParam EStatus status) {
+		return service.updateApproved(id, status);
+	}
 
+// user api
 	// hiển thị danh sách tất cả bài viết(PostUserDto)
 	@GetMapping("/user/post")
 	ResponseEntity<PostPaginationResponse<PostUserDto>> getAllPostsByUsername(
@@ -62,33 +77,46 @@ public class PostController {
 		return ResponseEntity.ok().body(service.getPostsByUsername(token, offset, size, field));
 	}
 
+	// get posts by status
 	@GetMapping("/user/post/get-by-status")
 	PostPaginationResponse<PostUserDto> getPostsByStatus(@RequestParam EStatus status, @RequestParam int offset,
 			@RequestParam int size, @RequestParam(defaultValue = "datePosted") String field) {
 		return service.getPostsByStatus(status, offset, size, field);
 	}
 	
-
-	@PutMapping("/user/post/{id}")
-	public PostDetailResponse updatePost(@RequestParam Long id, @Valid @RequestBody PostDetailDto postDetailDto) {
-		return service.updatePostById(id, postDetailDto);
+	// user send new post and wait for approve
+	@PostMapping("/user/post")
+	public ResponseEntity<?> createPost(@RequestHeader(name = "Authorization") String token,
+			@Valid @RequestBody PostDetailRequest postDetailRequest) {
+		token = token.split(" ")[1];
+		return service.createPost(token, postDetailRequest) != null ? ResponseEntity.ok().body("successful") : ResponseEntity.badRequest().body("failed");
 	}
 
+	// user send request to update post
+	@PutMapping("/user/post/{id}")
+	public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestParam(required = false) EStatus status, @Valid @RequestBody(required = false) PostDetailRequest postDetailRequest) {
+		return service.updatePostById(id, status, postDetailRequest) != null ? ResponseEntity.ok().body("sent") : ResponseEntity.badRequest().body("failed");
+	}
+
+	// user hide the post
 	@DeleteMapping("/user/post")
 	public void deletePosts(@RequestBody List<Long> ids) {
 		service.deletePosts(ids);
 	}
 
+// guest api
+	// guest get posts approved
 	@GetMapping("/post")
-	public PostPaginationResponse<PostApprovedDto> getPostsApproved(@RequestParam int offset,
-			@RequestParam int size, @RequestParam(defaultValue = "datePosted") String field) {
+	public PostPaginationResponse<PostApprovedDto> getPostsApproved(@RequestParam int offset, @RequestParam int size,
+			@RequestParam(defaultValue = "datePosted") String field) {
 		return service.getPostsApproved(offset, size, field);
 	}
 
 	// lọc bài viết theo khoảng giá
 	@GetMapping("/post/filter")
 	PostPaginationResponse<PostApprovedDto> filterPostsByPriceAndPagination(@RequestParam double min,
-			@RequestParam double max, @RequestParam int offset, @RequestParam int size, @RequestParam(defaultValue = "datePosted") String field) {
+			@RequestParam double max, @RequestParam int offset, @RequestParam int size,
+			@RequestParam(defaultValue = "datePosted") String field) {
 		return service.filterPostsByPriceAndPagination(min, max, offset, size, field);
 	}
 
@@ -99,16 +127,11 @@ public class PostController {
 		return service.searchByKeyword(keyword, offset, size, field);
 	}
 
+	// guest get post by id
 	@GetMapping("/post/{id}")
-	public PostDetailUserResponse getPostById(@PathVariable Long id) {
-		return service.getPostById(id);
+	public PostDetailUserResponse getPostById(@RequestHeader(value = "Accept-Language", required = false) Locale locale, @PathVariable Long id) {
+		return service.getPostById(id, locale);
 	}
 
-	@PostMapping("/post")
-	public Long createPost(@RequestHeader(name = "Authorization") String token,
-			@Valid @RequestBody PostDetailRequest postDetailRequest) {
-		token = token.split(" ")[1];
-		return service.createPost(token, postDetailRequest);
-	}
-
+	
 }

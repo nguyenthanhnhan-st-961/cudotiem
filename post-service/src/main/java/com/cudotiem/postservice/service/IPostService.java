@@ -1,6 +1,10 @@
 package com.cudotiem.postservice.service;
 
 import java.util.List;
+import java.util.Locale;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cudotiem.postservice.dto.post.PostAdminDto;
 import com.cudotiem.postservice.dto.post.PostApprovedDto;
@@ -17,7 +21,7 @@ public interface IPostService {
 	
 	List<PostDto> getAllPosts();
 	
-	PostPaginationResponse<PostAdminDto> getPostsAdmin(int offset, int size, String field);
+	PostPaginationResponse<PostAdminDto> getPostsAdmin(Locale locale, int offset, int size, String field);
 	
 	PostPaginationResponse<PostUserDto> getPostsByUsername(String username, int offset, int size, String field);
 	
@@ -31,13 +35,15 @@ public interface IPostService {
 	
 	PostPaginationResponse<PostApprovedDto> getPostsApproved(int offset , int size, String field);
 	
-	PostDetailUserResponse getPostById(Long id);
+	PostDetailUserResponse getPostById(Long id, Locale locale);
 	
 	Long createPost(String token, PostDetailRequest postDetailRequest);
 	
 	PostDetailResponse handlePost(Long id, EStatus status);
+	
+	PostDetailResponse updateApproved(Long id, EStatus status);
 
-	PostDetailResponse updatePostById(Long id, PostDetailDto postDetailDto);
+	String updatePostById(Long id, EStatus status, PostDetailRequest postDetailRequest);
 
 	void deletePosts(List<Long> ids);
 

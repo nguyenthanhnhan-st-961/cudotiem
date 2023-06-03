@@ -8,4 +8,5 @@ import com.cudotiem.accountservice.entity.Profile;
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Long>{
 
+	Profile findByUsername(String username);
 }

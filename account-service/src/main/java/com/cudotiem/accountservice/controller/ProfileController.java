@@ -33,9 +33,9 @@ public class ProfileController {
 		return ResponseEntity.ok().body(profileService.getProfile(id));
 	}
 	
-	@GetMapping("/user-info/{id}")
-	public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long id) {
-		return ResponseEntity.ok().body(profileService.getUserInfo(id));
+	@GetMapping("/user-info/{username}")
+	public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable String username) {
+		return ResponseEntity.ok().body(profileService.getUserInfo(username));
 	}
 
 	@PostMapping

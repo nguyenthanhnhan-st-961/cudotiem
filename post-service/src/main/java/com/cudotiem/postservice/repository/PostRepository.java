@@ -21,25 +21,19 @@ public interface PostRepository extends JpaRepository<Post, Long>{
 	List<Post> findByPricePagination(Double minPrice, Double maxPrice, Pageable pageable);
 	
 	
-	@Query("select p from Post p where CONCAT(p.content, ' ', p.title, ' ', p.status, ' ', p.slug) LIKE %?1%")
+	@Query("select p from Post p where CONCAT(p.content, ' ', p.title) LIKE %?1%")
 	List<Post> searchByKeyword(String keyword);
 	
-	@Query("select p from Post p where CONCAT(p.content, ' ', p.title, ' ', p.status, ' ', p.slug) LIKE %?1%")
+	@Query("select p from Post p where CONCAT(p.content, ' ', p.title) LIKE %?1%")
 	List<Post> searchByKeyword(String keyword, Pageable pageable);
 
-	@Query("select p from Post p where p.status LIKE '%approved%'")
-	List<Post> findAllByStatusEqualAprroved(Pageable pageable);
-	
-	@Query("select p from Post p where p.status LIKE '%approved%'")
-	List<Post> findAllByStatusEqualAprroved();
-	
-//	@Query("select p from Post p where p.status LIKE %?1%")
 	List<Post> findAllByStatus(EStatus status);
 	
-//	@Query("select p from Post p where p.status LIKE %?1%")
 	List<Post> findAllByStatus(EStatus status, Pageable pageable);
 	
 	List<Post> findAllByUsernameLike(String username);
 	
 	List<Post> findAllByUsernameLike(String username, Pageable pageable);
+	
+	List<Post> findByIdPost(Long idPost);
 }
