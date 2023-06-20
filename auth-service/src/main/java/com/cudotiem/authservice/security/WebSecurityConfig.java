@@ -20,7 +20,6 @@ import com.cudotiem.authservice.security.jwt.AuthTokenFilter;
 import com.cudotiem.authservice.security.service.CustomUserDetailsService;
 
 @Configuration
-//@EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 	
@@ -28,7 +27,7 @@ public class WebSecurityConfig {
 	CustomUserDetailsService userDetailsService;
 	
 	@Autowired
-	public AuthEntryPointJwt unauthorizedHandler;
+	private AuthEntryPointJwt unauthorizedHandler;
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
@@ -49,7 +48,6 @@ public class WebSecurityConfig {
 				.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers("/api/v1/auth/**").permitAll()
 				.requestMatchers("/api/test/**").permitAll()
-//				.requestMatchers("/api/auth/token", "/api/auth/validate").permitAll()
 				.anyRequest().authenticated());
 		httpSecurity.authenticationProvider(authenticationProvider());
 		httpSecurity.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

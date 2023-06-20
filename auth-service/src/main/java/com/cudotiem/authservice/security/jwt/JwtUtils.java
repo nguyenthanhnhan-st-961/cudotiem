@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
 import com.cudotiem.authservice.entity.User;
+import com.cudotiem.authservice.exception.TokenExpiredException;
 import com.cudotiem.authservice.security.service.CustomUserDetails;
 
 import io.jsonwebtoken.*;

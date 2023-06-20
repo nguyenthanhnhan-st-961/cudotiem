@@ -28,7 +28,6 @@ import com.cudotiem.authservice.payload.request.LoginRequest;
 import com.cudotiem.authservice.payload.request.SignupRequest;
 import com.cudotiem.authservice.payload.response.LoginResponse;
 import com.cudotiem.authservice.payload.response.MessageResponse;
-import com.cudotiem.authservice.payload.response.UserInfoResponse;
 import com.cudotiem.authservice.repository.RoleRepository;
 import com.cudotiem.authservice.repository.UserRepository;
 import com.cudotiem.authservice.security.jwt.JwtUtils;
@@ -85,7 +84,8 @@ public class AuthController {
 		ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-				.header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString()).body(new LoginResponse(jwtCookie.getValue(), roles));
+				.header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+				.body(new LoginResponse(jwtCookie.getValue(), roles));
 	}
 
 	@PostMapping("/signup")
@@ -110,12 +110,14 @@ public class AuthController {
 
 	@PostMapping("/signout")
 	public ResponseEntity<?> logoutUser() {
-		Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		if (!principle.toString().equals("anonymousUser")) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		Object principle = authentication.getPrincipal();
+		
+		if (principle.toString() != "anonymousUser") {
 			Long idUser = ((CustomUserDetails) principle).getId();
 			refreshTokenService.deleteByUserId(idUser);
 		}
-
+		
 		ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
 		ResponseCookie jwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
@@ -123,29 +125,20 @@ public class AuthController {
 				.body(new MessageResponse("You're been signed out!"));
 	}
 
+	@PostMapping("/refreshtoken")
 	public ResponseEntity<?> refreshToken(HttpServletRequest request) {
 		String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+
 		if ((refreshToken != null) && (refreshToken.length() > 0)) {
 			return refreshTokenService.findByToken(refreshToken).map(refreshTokenService::verifyExpiration)
 					.map(RefreshToken::getUser).map(user -> {
 						ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
 						return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-								.body(new MessageResponse("Token is refreshed successfully!"));
-					}).orElseThrow(() -> new TokenRefreshException(refreshToken, "Refresh token is not in database!"));
+								.body(new MessageResponse("Token is refreshed successfully"));
+					}).orElseThrow(() -> new TokenRefreshException(refreshToken, "Refresh token is not in database"));
 		}
-		return ResponseEntity.badRequest().body(new MessageResponse("Refresh token is empty!"));
+		return ResponseEntity.badRequest().body(new MessageResponse("Refresh token is empty"));
 	}
-
-//	@PostMapping("/token")
-//	public String getToken(@RequestBody LoginRequest authRequest) {
-//		Authentication authentication = authenticationManager.authenticate(
-//				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-//		if (authentication.isAuthenticated()) {
-//			return jwtUtils.generateTokenFromUsername(authRequest.getUsername());
-//		} else {
-//			throw new RuntimeException("invalid access");
-//		}
-//	}
 
 	@GetMapping("/validate")
 	public String validateToken(@RequestParam String token) {
@@ -161,7 +154,7 @@ public class AuthController {
 			return ResponseEntity.ok().body("User registered failed");
 		}
 	}
-	
+
 	@GetMapping("/get-username/{token}")
 	public String getUsernameFromToken(@PathVariable String token) {
 		return jwtUtils.getUsernameFromJwtToken(token);

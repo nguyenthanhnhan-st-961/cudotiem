@@ -50,9 +50,9 @@ public class PostController {
 // admin api
 	// hiển thị danh sách tất cả bài viết ở trang admin(PostAdminDto)
 	@GetMapping("/admin/post")
-	ResponseEntity<PostPaginationResponse<PostAdminDto>> getAllPostsAdmin(@RequestHeader(value = "Accept-Language", required = false) Locale locale, @RequestParam int offset,
+	ResponseEntity<PostPaginationResponse<PostAdminDto>> getAllPostsAdmin(@RequestHeader(value = "Accept-Language", required = false) Locale locale, @RequestParam(required = false) EStatus status, @RequestParam int offset,
 			@RequestParam int size, @RequestParam(defaultValue = "dateCreated") String field) {
-		return ResponseEntity.ok().body(service.getPostsAdmin(locale, offset, size, field));
+		return ResponseEntity.ok().body(service.getPostsAdmin(locale, status, offset, size, field));
 	}
 
 	// admin approve or reject the request create post
@@ -71,18 +71,22 @@ public class PostController {
 	// hiển thị danh sách tất cả bài viết(PostUserDto)
 	@GetMapping("/user/post")
 	ResponseEntity<PostPaginationResponse<PostUserDto>> getAllPostsByUsername(
-			@RequestHeader(name = "Authorization") String token, @RequestParam int offset, @RequestParam int size,
+			@RequestHeader(name = "Authorization") String token, @RequestParam(required = false) EStatus status ,@RequestParam int offset, @RequestParam int size,
 			@RequestParam(defaultValue = "dateCreated") String field) {
 		token = token.split(" ")[1];
-		return ResponseEntity.ok().body(service.getPostsByUsername(token, offset, size, field));
+		
+//		if(status != null) {
+//			return  ResponseEntity.ok().body(service.getPostsByStatus(status, offset, size, field));
+//		}
+		return ResponseEntity.ok().body(service.getPostsByUsername(token, status, offset, size, field));
 	}
 
 	// get posts by status
-	@GetMapping("/user/post/get-by-status")
-	PostPaginationResponse<PostUserDto> getPostsByStatus(@RequestParam EStatus status, @RequestParam int offset,
-			@RequestParam int size, @RequestParam(defaultValue = "datePosted") String field) {
-		return service.getPostsByStatus(status, offset, size, field);
-	}
+//	@GetMapping("/user/post/get-by-status")
+//	PostPaginationResponse<PostUserDto> getPostsByStatus(@RequestParam int offset,
+//			@RequestParam int size, @RequestParam(defaultValue = "datePosted") String field) {
+//		return service.getPostsByStatus(status, offset, size, field);
+//	}
 	
 	// user send new post and wait for approve
 	@PostMapping("/user/post")
@@ -94,8 +98,9 @@ public class PostController {
 
 	// user send request to update post
 	@PutMapping("/user/post/{id}")
-	public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestParam(required = false) EStatus status, @Valid @RequestBody(required = false) PostDetailRequest postDetailRequest) {
-		return service.updatePostById(id, status, postDetailRequest) != null ? ResponseEntity.ok().body("sent") : ResponseEntity.badRequest().body("failed");
+	public ResponseEntity<?> updatePost(@RequestHeader(name = "Authorization") String token, @PathVariable Long id, @RequestParam(required = false) EStatus status, @Valid @RequestBody(required = false) PostDetailRequest postDetailRequest) {
+		token = token.split(" ")[1];
+		return service.updatePostById(id, token, status, postDetailRequest) != null ? ResponseEntity.ok().body("sent") : ResponseEntity.badRequest().body("failed");
 	}
 
 	// user hide the post
@@ -107,9 +112,9 @@ public class PostController {
 // guest api
 	// guest get posts approved
 	@GetMapping("/post")
-	public PostPaginationResponse<PostApprovedDto> getPostsApproved(@RequestParam int offset, @RequestParam int size,
+	public PostPaginationResponse<PostApprovedDto> getPostsApproved(@RequestParam(required = false) String categoryCode, @RequestParam int offset, @RequestParam int size,
 			@RequestParam(defaultValue = "datePosted") String field) {
-		return service.getPostsApproved(offset, size, field);
+		return service.getPostsApproved(categoryCode, offset, size, field);
 	}
 
 	// lọc bài viết theo khoảng giá
@@ -133,5 +138,8 @@ public class PostController {
 		return service.getPostById(id, locale);
 	}
 
-	
+	@GetMapping("/post/status")
+	public List<EStatus> getAllStatus() {
+		return service.getAllStatus();
+	}
 }

@@ -21,19 +21,19 @@ public interface IPostService {
 	
 	List<PostDto> getAllPosts();
 	
-	PostPaginationResponse<PostAdminDto> getPostsAdmin(Locale locale, int offset, int size, String field);
+	PostPaginationResponse<PostAdminDto> getPostsAdmin(Locale locale, EStatus status, int offset, int size, String field);
 	
-	PostPaginationResponse<PostUserDto> getPostsByUsername(String username, int offset, int size, String field);
+	PostPaginationResponse<PostUserDto> getPostsByUsername(String username, EStatus status, int offset, int size, String field);
 	
 	List<PostDto> filterPostsByPrice(double min, double max);
 	
 	PostPaginationResponse<PostApprovedDto> filterPostsByPriceAndPagination(double min, double max, int offset, int size, String field);
 	
-	PostPaginationResponse<PostUserDto> getPostsByStatus(EStatus status, int offset, int size, String field);
+//	PostPaginationResponse<PostUserDto> getPostsByStatus(EStatus status, int offset, int size, String field);
 	
 	PostPaginationResponse<PostApprovedDto> searchByKeyword(String title, int offset, int size, String field);
 	
-	PostPaginationResponse<PostApprovedDto> getPostsApproved(int offset , int size, String field);
+	PostPaginationResponse<PostApprovedDto> getPostsApproved(String categoryCode, int offset , int size, String field);
 	
 	PostDetailUserResponse getPostById(Long id, Locale locale);
 	
@@ -43,8 +43,9 @@ public interface IPostService {
 	
 	PostDetailResponse updateApproved(Long id, EStatus status);
 
-	String updatePostById(Long id, EStatus status, PostDetailRequest postDetailRequest);
+	String updatePostById(Long id, String token, EStatus status, PostDetailRequest postDetailRequest);
 
 	void deletePosts(List<Long> ids);
-
+	
+	List<EStatus> getAllStatus();
 }

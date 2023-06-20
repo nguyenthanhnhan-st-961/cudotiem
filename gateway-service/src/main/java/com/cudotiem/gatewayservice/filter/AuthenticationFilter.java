@@ -29,10 +29,12 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 	public GatewayFilter apply(Config config) {
 		return ((exchange, chain) -> {
 			ServerHttpRequest request = exchange.getRequest();
+			
 			if(validator.isSecured.test(request)) {
 				if(!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
 					throw new RuntimeException("missing authorization header");
 				}
+				
 				String authHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
 				
 				String[] tokens = authHeader.split(" ");
@@ -41,12 +43,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 					throw new RuntimeException("Incorrect authorization header");
 				}
 				
-//				if(authHeader != null && authHeader.startsWith("Bearer ")) {
-//					authHeader = authHeader.substring(7);
-//				}
+				if(authHeader != null && authHeader.startsWith("Bearer ")) {
+					authHeader = authHeader.substring(7);
+				}
 				
 				try {
-//					String temp = restTemplate.getForObject("http://AUTH-SERVICE/validate?token=" + tokens[1], String.class);
 					  webClient.get()
 				                 .uri("http://localhost:8083/api/v1/auth/validate?token=" + tokens[1])
 				                         .retrieve()

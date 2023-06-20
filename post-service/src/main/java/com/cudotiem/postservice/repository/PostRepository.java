@@ -27,13 +27,20 @@ public interface PostRepository extends JpaRepository<Post, Long>{
 	@Query("select p from Post p where CONCAT(p.content, ' ', p.title) LIKE %?1%")
 	List<Post> searchByKeyword(String keyword, Pageable pageable);
 
-	List<Post> findAllByStatus(EStatus status);
+	@Query("select p from Post p where (:status is null or p.status = :status) and (:categoryCode is null or p.category.code = :categoryCode)")
+	List<Post> findAllByStatus(EStatus status, String categoryCode);
 	
-	List<Post> findAllByStatus(EStatus status, Pageable pageable);
+	@Query("select p from Post p where (:status is null or p.status = :status) and (:categoryCode is null or p.category.code = :categoryCode)")
+
+	List<Post> findAllByStatus(EStatus status, String categoryCode, Pageable pageable);
 	
-	List<Post> findAllByUsernameLike(String username);
+	@Query("select p from Post p where p.username like %:username% and (:status is null or p.status = :status)")
+	List<Post> findAllByUsernameLikeAndStatus(String username, EStatus status);
 	
-	List<Post> findAllByUsernameLike(String username, Pageable pageable);
+	@Query("select p from Post p where p.username like %:username% and (:status is null or p.status = :status)")
+	List<Post> findAllByUsernameLikeAndStatus(String username, EStatus status,Pageable pageable);
 	
 	List<Post> findByIdPost(Long idPost);
+	
+
 }
