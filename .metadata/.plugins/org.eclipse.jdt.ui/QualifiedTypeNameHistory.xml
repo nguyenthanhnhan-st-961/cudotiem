@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="java.util.Optional"/>
-    <fullyQualifiedTypeName name="java.time.format.DateTimeFormatter"/>
-    <fullyQualifiedTypeName name="com.cudotiem.postservice.dto.PostAdminDto"/>
-    <fullyQualifiedTypeName name="com.cudotiem.postservice.payload.response.PostAdminPaginationResponse"/>
-    <fullyQualifiedTypeName name="com.cudotiem.postservice.dto.PostDto"/>
-    <fullyQualifiedTypeName name="lombok.NoArgsConstructor"/>
-    <fullyQualifiedTypeName name="lombok.Data"/>
     <fullyQualifiedTypeName name="lombok.AllArgsConstructor"/>
     <fullyQualifiedTypeName name="lombok.Getter"/>
     <fullyQualifiedTypeName name="lombok.Setter"/>
@@ -16,7 +9,6 @@
     <fullyQualifiedTypeName name="com.cudotiem.postservice.dto.post.PostUserDto"/>
     <fullyQualifiedTypeName name="com.cudotiem.postservice.dto.post.PostApprovedDto"/>
     <fullyQualifiedTypeName name="org.springframework.web.servlet.LocaleResolver"/>
-    <fullyQualifiedTypeName name="org.springframework.context.annotation.Configuration"/>
     <fullyQualifiedTypeName name="org.springframework.context.i18n.LocaleContextHolder"/>
     <fullyQualifiedTypeName name="org.springframework.web.servlet.config.annotation.WebMvcConfigurer"/>
     <fullyQualifiedTypeName name="org.springframework.data.domain.Sort.Direction"/>
@@ -42,7 +34,6 @@
     <fullyQualifiedTypeName name="com.cudotiem.authservice.exception.TokenExpiredException"/>
     <fullyQualifiedTypeName name="org.springframework.http.HttpCookie"/>
     <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.GetMapping"/>
-    <fullyQualifiedTypeName name="java.lang.Override"/>
     <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestParam"/>
     <fullyQualifiedTypeName name="org.springframework.web.jsf.FacesContextUtils"/>
     <fullyQualifiedTypeName name="jakarta.servlet.http.HttpServletRequest"/>
@@ -60,4 +51,13 @@
     <fullyQualifiedTypeName name="jakarta.persistence.CascadeType"/>
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="jakarta.persistence.FetchType"/>
+    <fullyQualifiedTypeName name="org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer"/>
+    <fullyQualifiedTypeName name="org.springframework.context.annotation.Configuration"/>
+    <fullyQualifiedTypeName name="org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker"/>
+    <fullyQualifiedTypeName name="org.springframework.messaging.simp.config.MessageBrokerRegistry"/>
+    <fullyQualifiedTypeName name="java.lang.Override"/>
+    <fullyQualifiedTypeName name="org.springframework.web.socket.config.annotation.StompEndpointRegistry"/>
+    <fullyQualifiedTypeName name="org.springframework.stereotype.Controller"/>
+    <fullyQualifiedTypeName name="org.springframework.messaging.handler.annotation.MessageMapping"/>
+    <fullyQualifiedTypeName name="org.springframework.messaging.handler.annotation.SendTo"/>
 </qualifiedTypeNameHistroy>
